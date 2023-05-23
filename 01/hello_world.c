@@ -1,0 +1,20 @@
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+
+//MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Romain Kowalski");
+MOUDLE_DESCRIPTION("A sussy module");
+
+static int __init hello_world_init(void)
+{
+	printk(KERN_WARNING "SUS");
+}
+
+static void __exit hello_world_cleanup(void)
+{
+	printk(KERN_WARNING "AMOGUS");
+}
+
+module_init(hello_world_init);
+module_exit(hello_world_cleanup);
