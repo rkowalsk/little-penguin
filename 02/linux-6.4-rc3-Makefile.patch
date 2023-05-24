@@ -1,0 +1,19 @@
+Submitted By:            rkowalsk <rkowalsk@student.42lyon.fr>                  
+Date:                    2023-05-24                                             
+Initial Package Version: 6.4-rc3
+Upstream Status:         Not submitted                                          
+Origin:                  Romain Kowalski                                        
+Description:             Changes kernel version string in hte Makefile
+
+diff --color -rauN linux-6.4-rc3-torvalds.orig/Makefile linux-6.4-rc3-torvalds/Makefile
+--- linux-6.4-rc3-torvalds.orig/Makefile	2023-05-22 13:24:39.000000000 +0200
++++ linux-6.4-rc3-torvalds/Makefile	2023-05-24 12:07:08.297663557 +0200
+@@ -2,7 +2,7 @@
+ VERSION = 6
+ PATCHLEVEL = 4
+ SUBLEVEL = 0
+-EXTRAVERSION = -rc3
++EXTRAVERSION = -rc3-thor_kernel
+ NAME = Hurr durr I'ma ninja sloth
+ 
+ # *DOCUMENTATION*
