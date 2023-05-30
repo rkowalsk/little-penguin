@@ -1,0 +1,17 @@
+[ 1146.905369] usb 1-1: new high-speed USB device number 7 using ehci-pci
+[ 1147.347177] usb 1-1: New USB device found, idVendor=0930, idProduct=6545, bcdDevice= 1.10
+[ 1147.347678] usb 1-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[ 1147.348037] usb 1-1: Product: DataTraveler 2.0
+[ 1147.348318] usb 1-1: Manufacturer: Kingston
+[ 1147.348579] usb 1-1: SerialNumber: AC220B280602B260491F4AAF
+[ 1147.349428] usb-storage 1-1:1.0: USB Mass Storage device detected
+[ 1147.351034] scsi host2: usb-storage 1-1:1.0
+[ 1147.355584] Hello World
+[ 1148.399738] scsi 2:0:0:0: Direct-Access     Kingston DataTraveler 2.0 PMAP PQ: 0 ANSI: 6
+[ 1148.404899] sd 2:0:0:0: Attached scsi generic sg2 type 0
+[ 1148.416366] sd 2:0:0:0: [sdb] 30240768 512-byte logical blocks: (15.5 GB/14.4 GiB)
+[ 1148.423459] sd 2:0:0:0: [sdb] Write Protect is off
+[ 1148.423712] sd 2:0:0:0: [sdb] Mode Sense: 45 00 00 00
+[ 1148.430486] sd 2:0:0:0: [sdb] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+[ 1148.592905]  sdb: sdb1
+[ 1148.593441] sd 2:0:0:0: [sdb] Attached SCSI removable disk
