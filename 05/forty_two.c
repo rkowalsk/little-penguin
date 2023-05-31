@@ -11,28 +11,48 @@ MODULE_DESCRIPTION("42 nerd module");
 
 #define	MODULE_NAME "forty_two"
 #define	DEVICE_NAME "fortytwo"
-static const char	login[] = "rkowalsk";
-static const size_t	login_size = strlen(login);
 
-//static unsigned int	count = 0;
+static const char	login[] = "rkowalsk\n";
+static size_t		login_size = strlen(login);
+
+static ssize_t	ft_write(struct file *filp, const char __user *buffer,
+						size_t len, loff_t *offset)
+{
+	char	local_buff[10];
+
+	if (len != login_size)
+		return (-EINVAL);
+	if (copy_from_user(local_buff, buffer, len))
+		return (-EFAULT);
+	if (memcmp(local_buff, login, len))
+		return (-EINVAL);
+	return (login_size);
+}
 
 static ssize_t	ft_read(struct file *filp, char __user *buffer, size_t len,
-							loff_t *offset)
+								loff_t *offset)
 {
-	char	*message = login;
-	size_t	i = 0;
-	while (i < len && i < login_size)
+	size_t	i = *offset;
+	size_t	count_read = 0;
+
+	if (*offset == login_size)
 	{
-		if (put_user(*(message++), buffer++))
-			return (-EFAULT);
-		i++;
+		*offset = 0;
+		return (0);
 	}
-	return (i);
+	while (count_read < len && i < login_size)
+	{
+		if (put_user(login[i++], buffer++))
+			return (-1);
+		count_read++;
+	}
+	*offset = i;
+	return (count_read);
 }
 
 static struct file_operations	fops = {
 	.read = ft_read,
-//	.write = ft_write
+	.write = ft_write
 };
 
 static struct miscdevice	misc = {
