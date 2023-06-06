@@ -15,8 +15,10 @@ MODULE_DESCRIPTION("Using debugfs for the first time ever in my entire life.");
 struct dentry		*parent_entry;
 struct dentry		*id_entry;
 struct dentry		*jiffies_entry;
+struct dentry		*foo_entry;
 static const char	login[] = "rkowalsk\n";
 static size_t		login_size = strlen(login);
+static char		foo_buffer[PAGE_SIZE];
 
 static ssize_t	id_write(struct file *filp, const char __user *buffer,
 						size_t len, loff_t *offset)
@@ -86,6 +88,54 @@ static struct file_operations	jiffies_fops = {
 	.read = jiffies_read
 };
 
+static ssize_t	foo_read(struct file *filp, char __user *buffer, size_t len,
+								loff_t *offset)
+{
+	size_t	i = *offset;
+	size_t	count_read = 0;
+	size_t	foo_size = strlen(foo_buffer);
+	if (*offset >= foo_size)
+	{
+		*offset = 0;
+		return (0);
+	}
+	while (count_read < len && i < foo_size)
+	{
+		if (put_user(foo_buffer[i++], buffer++))
+			return (-1);
+		count_read++;
+	}
+	*offset = i;
+	return (count_read);
+}
+
+static ssize_t	foo_write(struct file *filp, const char __user *buffer,
+						size_t len, loff_t *offset)
+{
+	size_t	write_size;
+	size_t	foo_old_size;
+	foo_old_size = strlen(foo_buffer);
+	if (*offset >= PAGE_SIZE - 1)
+		return (-EFBIG);
+	if (PAGE_SIZE - *offset - 1 <= len)
+		write_size = PAGE_SIZE - *offset - 1;
+	else
+		write_size = len;
+	if (copy_from_user(foo_buffer + *offset, buffer, write_size))
+		return (-EFAULT);
+	if (foo_old_size > *offset + write_size)
+		foo_buffer[foo_old_size] = 0;
+	else
+		foo_buffer[*offset + write_size] = 0;
+	*offset += write_size;
+	return (write_size);
+}
+
+static struct file_operations	foo_fops = {
+	.read = foo_read,
+	.write = foo_write
+};
+
 static int __init parent_init(void)
 {
 	parent_entry = debugfs_create_dir("fortytwo", NULL);
@@ -101,7 +151,7 @@ static int __init parent_init(void)
 
 static int __init id_init(void)
 {
-	id_entry = debugfs_create_file("id", 770, parent_entry, NULL,
+	id_entry = debugfs_create_file("id", 0666, parent_entry, NULL,
 								&id_fops);
 	if (IS_ERR(id_entry))
 	{
@@ -115,7 +165,7 @@ static int __init id_init(void)
 
 static int __init jiffies_init(void)
 {
-	jiffies_entry = debugfs_create_file("jiffies", 700, parent_entry, NULL,
+	jiffies_entry = debugfs_create_file("jiffies", 0444, parent_entry, NULL,
 								&jiffies_fops);
 	if (IS_ERR(jiffies_entry))
 	{
@@ -124,6 +174,21 @@ static int __init jiffies_init(void)
 							err_code);
 		return (-err_code);
 	}
+	return (0);
+}
+
+static int __init foo_init(void)
+{
+	foo_entry = debugfs_create_file("foo", 0644, parent_entry, NULL,
+								&foo_fops);
+	if (IS_ERR(foo_entry))
+	{
+		long	err_code = PTR_ERR(foo_entry);
+		pr_err("Registrering module %s failed: %ld\n", MODULE_NAME,
+							err_code);
+		return (-err_code);
+	}
+	foo_buffer[0] = '\0';
 	return (0);
 }
 
@@ -138,6 +203,9 @@ static int __init debog_init(void)
 	if (err_code)
 		return (err_code);
 	err_code = jiffies_init();
+	if (err_code)
+		return (err_code);
+	err_code = foo_init();
 	if (err_code)
 		return (err_code);
 	pr_info("Module %s loaded\n", MODULE_NAME);
