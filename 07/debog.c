@@ -5,6 +5,7 @@
 #include <linux/err.h>
 #include <linux/fs.h>
 #include <linux/debugfs.h>
+#include <linux/mutex.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("rkowalsk");
@@ -19,6 +20,7 @@ struct dentry		*foo_entry;
 static const char	login[] = "rkowalsk\n";
 static size_t		login_size = strlen(login);
 static char		foo_buffer[PAGE_SIZE];
+static			DEFINE_MUTEX(foo_mutex);
 
 static ssize_t	id_write(struct file *filp, const char __user *buffer,
 						size_t len, loff_t *offset)
@@ -93,18 +95,25 @@ static ssize_t	foo_read(struct file *filp, char __user *buffer, size_t len,
 {
 	size_t	i = *offset;
 	size_t	count_read = 0;
-	size_t	foo_size = strlen(foo_buffer);
+	size_t	foo_size;
+	mutex_lock(&foo_mutex);
+	foo_size = strlen(foo_buffer);
 	if (*offset >= foo_size)
 	{
 		*offset = 0;
+		mutex_unlock(&foo_mutex);
 		return (0);
 	}
 	while (count_read < len && i < foo_size)
 	{
 		if (put_user(foo_buffer[i++], buffer++))
+		{
+			mutex_unlock(&foo_mutex);
 			return (-1);
+		}
 		count_read++;
 	}
+	mutex_unlock(&foo_mutex);
 	*offset = i;
 	return (count_read);
 }
@@ -112,22 +121,21 @@ static ssize_t	foo_read(struct file *filp, char __user *buffer, size_t len,
 static ssize_t	foo_write(struct file *filp, const char __user *buffer,
 						size_t len, loff_t *offset)
 {
-	size_t	write_size;
-	size_t	foo_old_size;
-	foo_old_size = strlen(foo_buffer);
+	size_t		write_size;
+	unsigned long	copy_ret;
 	if (*offset >= PAGE_SIZE - 1)
 		return (-EFBIG);
 	if (PAGE_SIZE - *offset - 1 <= len)
 		write_size = PAGE_SIZE - *offset - 1;
 	else
 		write_size = len;
-	if (copy_from_user(foo_buffer + *offset, buffer, write_size))
+	mutex_lock(&foo_mutex);
+	copy_ret = copy_from_user(foo_buffer + *offset, buffer, write_size);
+	mutex_unlock(&foo_mutex);
+	if (copy_ret)
 		return (-EFAULT);
-	if (foo_old_size > *offset + write_size)
-		foo_buffer[foo_old_size] = 0;
-	else
-		foo_buffer[*offset + write_size] = 0;
 	*offset += write_size;
+	foo_buffer[*offset] = 0;
 	return (write_size);
 }
 
