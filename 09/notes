@@ -1,0 +1,3 @@
+recuperer la liste chainee de fichier et iterer en verifiant si ils sont montes.
+utiliser down_read et up_read (?) pour lire la liste, ou down_read_interruptible.
+utiliser __is_local_mountpoint ?
