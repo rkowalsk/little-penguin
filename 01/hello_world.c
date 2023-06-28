@@ -4,7 +4,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Romain Kowalski");
-MODULE_DESCRIPTION("A simple module");
+MODULE_DESCRIPTION("A simple Hello World module");
 
 static int __init hello_world_init(void)
 {

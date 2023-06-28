@@ -42,13 +42,11 @@ static ssize_t	id_read(struct file *filp, char __user *buffer, size_t len,
 	size_t	i = *offset;
 	size_t	count_read = 0;
 
-	if (*offset == login_size)
-	{
+	if (*offset == login_size) {
 		*offset = 0;
 		return (0);
 	}
-	while (count_read < len && i < login_size)
-	{
+	while (count_read < len && i < login_size) {
 		if (put_user(login[i++], buffer++))
 			return (-1);
 		count_read++;
@@ -71,13 +69,11 @@ static ssize_t	jiffies_read(struct file *filp, char __user *buffer, size_t len,
 	size_t	i = *offset;
 	size_t	count_read = 0;
 	output_len = snprintf(output, 20, "%llu\n", timestamp);
-	if (*offset == output_len)
-	{
+	if (*offset == output_len) {
 		*offset = 0;
 		return (0);
 	}
-	while (count_read < len && i < output_len)
-	{
+	while (count_read < len && i < output_len) {
 		if (put_user(output[i++], buffer++))
 			return (-1);
 		count_read++;
@@ -98,16 +94,13 @@ static ssize_t	foo_read(struct file *filp, char __user *buffer, size_t len,
 	size_t	foo_size;
 	mutex_lock(&foo_mutex);
 	foo_size = strlen(foo_buffer);
-	if (*offset >= foo_size)
-	{
+	if (*offset >= foo_size) {
 		*offset = 0;
 		mutex_unlock(&foo_mutex);
 		return (0);
 	}
-	while (count_read < len && i < foo_size)
-	{
-		if (put_user(foo_buffer[i++], buffer++))
-		{
+	while (count_read < len && i < foo_size) {
+		if (put_user(foo_buffer[i++], buffer++)) {
 			mutex_unlock(&foo_mutex);
 			return (-1);
 		}
@@ -147,8 +140,7 @@ static struct file_operations	foo_fops = {
 static int __init parent_init(void)
 {
 	parent_entry = debugfs_create_dir("fortytwo", NULL);
-	if (IS_ERR(parent_entry))
-	{
+	if (IS_ERR(parent_entry)) {
 		long	err_code = PTR_ERR(parent_entry);
 		pr_err("Registrering module %s failed: %ld\n", MODULE_NAME,
 							err_code);
@@ -161,8 +153,7 @@ static int __init id_init(void)
 {
 	id_entry = debugfs_create_file("id", 0666, parent_entry, NULL,
 								&id_fops);
-	if (IS_ERR(id_entry))
-	{
+	if (IS_ERR(id_entry)) {
 		long	err_code = PTR_ERR(id_entry);
 		pr_err("Registrering module %s failed: %ld\n", MODULE_NAME,
 							err_code);
@@ -175,8 +166,7 @@ static int __init jiffies_init(void)
 {
 	jiffies_entry = debugfs_create_file("jiffies", 0444, parent_entry, NULL,
 								&jiffies_fops);
-	if (IS_ERR(jiffies_entry))
-	{
+	if (IS_ERR(jiffies_entry)) {
 		long	err_code = PTR_ERR(jiffies_entry);
 		pr_err("Registrering module %s failed: %ld\n", MODULE_NAME,
 							err_code);
@@ -189,8 +179,7 @@ static int __init foo_init(void)
 {
 	foo_entry = debugfs_create_file("foo", 0644, parent_entry, NULL,
 								&foo_fops);
-	if (IS_ERR(foo_entry))
-	{
+	if (IS_ERR(foo_entry)) {
 		long	err_code = PTR_ERR(foo_entry);
 		pr_err("Registrering module %s failed: %ld\n", MODULE_NAME,
 							err_code);

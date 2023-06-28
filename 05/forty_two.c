@@ -35,13 +35,11 @@ static ssize_t	ft_read(struct file *filp, char __user *buffer, size_t len,
 	size_t	i = *offset;
 	size_t	count_read = 0;
 
-	if (*offset == login_size)
-	{
+	if (*offset == login_size) {
 		*offset = 0;
 		return (0);
 	}
-	while (count_read < len && i < login_size)
-	{
+	while (count_read < len && i < login_size) {
 		if (put_user(login[i++], buffer++))
 			return (-1);
 		count_read++;
@@ -64,8 +62,7 @@ static struct miscdevice	misc = {
 static int __init fortytwo_init(void)
 {
 	unsigned int	ret = misc_register(&misc);
-	if (ret < 0)
-	{
+	if (ret < 0) {
 		pr_err("Registrering module %s failed: %d\n", MODULE_NAME, ret);	
 		return (ret);
 	}
