@@ -7,7 +7,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Louis Solofrizzo <louis@ne02ptzero.me>");
-MODULE_DESCRIPTION("Creates a file to write and read from.");
+MODULE_DESCRIPTION("Creates a file to write to and read in reverse from.");
 
 static ssize_t	myfd_read(struct file *fp, char __user *user, size_t size,
 					loff_t *offs);
